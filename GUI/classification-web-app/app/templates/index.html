@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Classifier</title>
+    <script>
+        function handleImageUpload(event) {
+            const formData = new FormData();
+            formData.append("image", event.target.files[0]);
+
+            fetch("/", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                const imagePreview = document.getElementById("image-preview");
+                const classifyButton = document.getElementById("classify-button");
+                imagePreview.src = data.image_url;
+                imagePreview.style.display = "block";
+                classifyButton.style.display = "block";
+            });
+        }
+
+        function classifyImage() {
+            const status = document.getElementById("status");
+            status.textContent = "Processing Image...";
+            fetch("/classify", { method: "POST" })
+                .then(response => response.json())
+                .then(data => {
+                    status.textContent = data.status;
+                });
+        }
+    </script>
+</head>
+<body>
+    <h1>Image Classifier</h1>
+    <input type="file" accept="image/png" onchange="handleImageUpload(event)">
+    <br><br>
+    <img id="image-preview" src="" alt="Uploaded Image" style="display:none; max-width: 300px;">
+    <br><br>
+    <button id="classify-button" style="display:none;" onclick="classifyImage()">Classify Image</button>
+    <p id="status"></p>
+    <ul>
+        <li><a href="/settings">Settings</a></li>
+    </ul>
+</body>
+</html>

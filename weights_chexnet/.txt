@@ -1,0 +1,1 @@
+download chexnet weights here: https://github.com/arnoweng/CheXNet

@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Model Classifier</title>
+  <link href="https://fonts.googleapis.com/css2?family=Rethink+Sans:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://kit.fontawesome.com/59ff2ab718.js" crossorigin="anonymous"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Rethink Sans', Arial, sans-serif;
+      background-color: #f5f7fa;
+    }
+
+    .container {
+      display: flex;
+      height: 100vh;
+    }
+
+    .sidebar {
+      width: 250px;
+      background-color: #ffffff;
+      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .sidebar .menu {
+      padding: 20px;
+    }
+
+    .sidebar .menu h2 {
+      font-size: 18px;
+      color: #007bff;
+      margin-bottom: 20px;
+    }
+
+    .sidebar .menu ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .sidebar .menu ul li {
+      margin-bottom: 15px;
+    }
+
+    .sidebar .menu ul li a {
+      text-decoration: none;
+      color: #333;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+    }
+
+    .sidebar .menu ul li a:hover {
+      color: #007bff;
+    }
+
+    .sidebar .menu ul li a.active {
+      color: #007bff;
+      font-weight: bold;
+    }
+
+    .sidebar .logout {
+      padding: 20px;
+      text-align: center;
+    }
+
+    .sidebar .logout a {
+      text-decoration: none;
+      color: #ff4d4d;
+      font-size: 16px;
+    }
+
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background-color: #eef2f7;
+      padding: 20px;
+    }
+
+    .classification-results table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    .classification-results th, .classification-results td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+
+    .classification-results th {
+      background-color: #f2f2f2;
+    }
+
+    .upload-container {
+      text-align: center;
+    }
+
+    .upload-container button {
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      padding: 30px 60px;
+      font-size: 24px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 10px;
+      font-family: 'Rethink Sans', Arial, sans-serif;
+    }
+
+    .upload-container button:hover {
+      background-color: #0056b3;
+    }
+
+    .icon-space {
+    margin-right: 8px;
+    }
+
+    #preview {
+      margin-top: 20px;
+      max-width: 100%;
+      height: auto;
+      display: none;
+      border: 2px solid #ccc;
+      border-radius: 5px;
+    }
+
+    #classifyBtn {
+      display: none;
+    }
+
+    #loadingScreen {
+      display: none;
+      font-size: 24px;
+      color: #2c2c2c;
+    }
+
+    .predictions {
+      margin-top: 30px;
+      text-align: left;
+      width: 100%;
+    }
+
+    .predictions h3 {
+      font-size: 18px;
+      color: #333;
+      margin-bottom: 10px;
+    }
+
+    .predictions ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .predictions ul li {
+      margin-bottom: 8px;
+      font-size: 16px;
+      color: #555;
+    }
+
+    /* Additional styles for top 5 predictions */
+    #top5Predictions {
+      margin-top: 20px;
+      width: 100%;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      text-align: left;
+    }
+
+    #top5Predictions h3 {
+      font-size: 18px;
+      color: #333;
+      margin-bottom: 10px;
+    }
+
+    #top5Predictions ol {
+      padding: 0;
+      list-style-position: inside;
+      max-width: 500px;
+      margin: 0 auto;
+      text-align: left;
+    }
+
+    #top5Predictions li {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 8px;
+    }
+
+    #top5Predictions .class-name {
+      display: inline-block;
+      min-width: 140px;
+      font-weight: bold;
+    }
+
+    #top5Predictions .probability {
+      display: inline-block;
+      min-width: 70px;
+    }
+
+    #top5Predictions .badge {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: bold;
+      color: #fff;
+    }
+
+    #top5Predictions .badge.positive {
+      background: #28a745;
+    }
+
+    #top5Predictions .badge.negative {
+      background: #dc3545;
+    }
+
+    /* Dark mode styles */
+    body.darkmode {
+      background-color: #121212;
+      color: #e0e0e0;
+    }
+
+    .sidebar.darkmode {
+      background-color: #1e1e1e;
+      color: #e0e0e0;
+    }
+
+    .sidebar.darkmode .menu h2 {
+      color: #007bff;
+    }
+
+    .sidebar.darkmode .menu ul li a {
+      color: #e0e0e0;
+    }
+
+    .sidebar.darkmode .menu ul li a:hover {
+      color: #007bff;
+    }
+
+    .sidebar.darkmode .menu ul li a.active {
+      color: #007bff;
+      font-weight: bold;
+    }
+
+    .sidebar.darkmode .logout a {
+      color: #ff4d4d;
+    }
+
+    .main-content.darkmode {
+      background-color: #121212;
+      color: #e0e0e0;
+    }
+
+    .classification-results.darkmode table {
+      background-color: #1e1e1e;
+      color: #e0e0e0;
+    }
+
+    .classification-results.darkmode th {
+      background-color: #2c2c2c;
+      color: #e0e0e0;
+    }
+
+    .classification-results.darkmode td {
+      border-color: #444;
+    }
+
+    .upload-container.darkmode button {
+      background-color: #007bff;
+      color: #fff;
+    }
+
+    .upload-container.darkmode button:hover {
+      background-color: #0056b3;
+    }
+
+    #loadingScreen.darkmode {
+      color: #e0e0e0;
+    }
+
+    .predictions.darkmode h3 {
+      color: #e0e0e0;
+    }
+
+    .predictions.darkmode ul li {
+      color: #e0e0e0;
+    }
+
+    /* Additional styles for top 5 predictions in dark mode */
+    #top5Predictions.darkmode h3 {
+      color: #e0e0e0;
+    }
+
+    #top5Predictions.darkmode ol {
+      background-color: #1e1e1e;
+      padding: 10px;
+      border-radius: 5px;
+    }
+
+    #top5Predictions.darkmode li {
+      background-color: #2c2c2c;
+      padding: 8px;
+      border-radius: 5px;
+    }
+
+    #top5Predictions.darkmode .class-name {
+      color: #e0e0e0;
+    }
+
+    #top5Predictions.darkmode .probability {
+      color: #e0e0e0;
+    }
+
+    #top5Predictions.darkmode .badge.positive {
+      background: #28a745;
+    }
+
+    #top5Predictions.darkmode .badge.negative {
+      background: #dc3545;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="sidebar" id="sidebar">
+      <div class="menu">
+        <h2>HybridCheX.</h2>
+        <ul>
+          <li><a href="/dashboard"> <i class="fa-solid fa-table-columns" style="margin-right: 8px;"></i> Dashboard</a></li>
+          <li><a href="/model-classifier" class="active"> <i class="fa-solid fa-robot" style="margin-right: 8px;"></i> Model Classifier </a>  </li> 
+          <li><a href="/radiologist-classifier"> <i class="fa-solid fa-user-doctor" style="margin-right: 8px;"></i> Radiologist Classifier</a></li>
+          <li><a href="/report"> <i class="fa-solid fa-file-lines" style="margin-right: 8px;"></i> Report</a></li>
+          <li><a href="/settings"><i class="fa-solid fa-gear" style="margin-right: 8px;"></i>Settings</a></li>
+          <li><a href="/documentation"> <i class="fa-solid fa-circle-info" style=" margin-right: 8px;"></i>Documentation</a></li>
+        </ul>
+      </div>
+      <div class="logout">
+        <a href="#"> <i class="fa-solid fa-right-from-bracket" style=" margin-right: 8px;"></i>Log out</a>
+      </div>
+    </div>
+    <div class="main-content" id="mainContent">
+      <div class="upload-container">
+        <input type="file" id="fileInput" accept=".png" style="display: none;">
+        <button type="button" id="uploadButton"> <i class="fa-solid fa-folder-open"></i> Upload Thorax X-Ray </button>
+        <br />
+        <img id="preview" />
+        <button id="classifyBtn">Classify Image</button>
+      </div>
+      <div id="loadingScreen"> <i class="fa-solid fa-spinner" style="margin-right: 8px;"> </i>Classifying... Please wait</div>
+      <div id="resultScreen" style="display: none; text-align: center;">
+        <h2 style="margin-bottom: 30px;">Model Classification</h2>
+        <div style="display: flex; justify-content: space-around; align-items: flex-start; margin: 40px 20px;">
+          <!-- Processed Image Section -->
+          <div style="flex: 1; text-align: center;">
+            <h3>Processed Image</h3>
+            <img id="resultImage" style="width: 300px; border: 2px solid #ccc; border-radius: 5px;" />
+            <div style="font-size: 14px;">Original Image</div>
+          </div>
+
+          <!-- Interpretation Section -->
+          <div style="flex: 1; text-align: center;">
+            <h3>Interpretation</h3>
+            <img id="interpretationImage" style="width: 300px; border: 2px solid #ccc; border-radius: 5px;" />
+            <div style="font-size: 14px;">Grad-CAM Heatmap on greatest classification</div>
+          </div>
+
+          <!-- Classification Center Section (RIGHT COLUMN) -->
+          <div style="flex: 1; text-align: left; display: flex; flex-direction: column; align-items: flex-start; margin-left: 40px;">
+            <h3 style="align-self: center;">Model Classification</h3>
+            <!-- Dynamic classification list -->
+            <ul id="classificationList" style="list-style: none; padding: 0; margin-bottom: 30px; margin-top: 20px;">
+              <!-- Leeg bij initial load, wordt gevuld door JS na classificatie -->
+            </ul>
+            <div style="display: flex; justify-content: center; gap: 18px; margin-bottom: 20px; width: 100%;">
+              <button style="background-color: red; color: white; border: none; padding: 10px 18px; border-radius: 5px; font-size: 15px; font-family: 'Rethink Sans', Arial, sans-serif; flex:1; max-width: 170px;">REPORT MISCLASSIFICATION</button>
+              <button id="backButton" style="background-color: #007bff; color: #fff; border: none; padding: 10px 18px; border-radius: 5px; font-size: 15px; cursor: pointer; font-family: 'Rethink Sans', Arial, sans-serif; flex:1; max-width: 170px;">BACK</button>
+              <button id="continueButton" style="background-color: #28a745; color: #fff; border: none; padding: 10px 18px; border-radius: 5px; font-size: 15px; cursor: pointer; font-family: 'Rethink Sans', Arial, sans-serif; flex:1; max-width: 170px;">CONTINUE</button>
+            </div>
+          </div>
+        </div>
+        <!-- Top 5 voorspellingen onderaan het scherm -->
+        <div id="top5Predictions" style="margin-top: 40px; text-align: center;"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const fileInput = document.getElementById('fileInput');
+    const uploadButton = document.getElementById('uploadButton');
+    const preview = document.getElementById('preview');
+    const classifyBtn = document.getElementById('classifyBtn');
+    const loadingScreen = document.getElementById('loadingScreen');
+    const mainContent = document.getElementById('mainContent');
+
+    uploadButton.addEventListener('click', () => {
+      console.log('[UI] Upload button clicked');
+      fileInput.click();
+    });
+
+    fileInput.addEventListener('change', () => {
+      const file = fileInput.files[0];
+      if (file) {
+        console.log('[UI] File selected:', file.name);
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          preview.src = e.target.result;
+          preview.style.display = 'block';
+          classifyBtn.style.display = 'inline-block';
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    classifyBtn.addEventListener('click', () => {
+      const file = fileInput.files[0];
+      if (!file) {
+        alert('Please upload a file first.');
+        return;
+      }
+      console.log('[UI] Classify button clicked, sending file:', file.name);
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      document.querySelector('.upload-container').style.display = 'none';
+      loadingScreen.style.display = 'block';
+
+      fetch('/classify-image', {
+        method: 'POST',
+        body: formData
+      })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('HTTP error ' + response.status);
+          }
+          return response.json();
+        })
+        .then(data => {
+          loadingScreen.style.display = 'none';
+          document.getElementById('resultScreen').style.display = 'block';
+          console.log('[UI] Received response from backend:', data);
+
+          if (data.error) {
+            alert(data.error);
+            document.querySelector('.upload-container').style.display = 'block';
+            document.getElementById('resultScreen').style.display = 'none';
+            return;
+          }
+
+          // --- Forceer tonen van resultaat-afbeeldingen ---
+          const resultImage = document.getElementById('resultImage');
+          const interpretationImage = document.getElementById('interpretationImage');
+          if (resultImage) {
+            resultImage.src = preview.src;
+            resultImage.style.display = 'block';
+          }
+          if (interpretationImage) {
+            interpretationImage.style.display = 'block';
+          }
+
+          // --- GradCAM ---
+          const gradcamResult = document.getElementById('gradcamResult');
+          const gradcamPlaceholder = document.querySelector('img[alt="Grad-CAM Heatmap"]');
+          let gradcamUrl = data.gradcam_url;
+          if (gradcamUrl) {
+            gradcamUrl += (gradcamUrl.includes('?') ? '&' : '?') + 't=' + new Date().getTime();
+          }
+          if (gradcamUrl && interpretationImage) {
+            interpretationImage.src = gradcamUrl;
+            if (gradcamResult) {
+              gradcamResult.src = gradcamUrl;
+              gradcamResult.style.display = 'block';
+            }
+            if (gradcamPlaceholder) gradcamPlaceholder.style.display = 'none';
+            const openBtn = document.getElementById('openGradcamBtn');
+            if (openBtn) {
+              openBtn.style.display = 'inline-block';
+              openBtn.href = gradcamUrl;
+            }
+            let gradcamMsg = document.getElementById('gradcamMsg');
+            if (gradcamMsg) gradcamMsg.style.display = 'none';
+          } else if (interpretationImage) {
+            interpretationImage.src = preview.src;
+            if (gradcamResult) {
+              gradcamResult.src = '';
+              gradcamResult.style.display = 'none';
+            }
+            if (gradcamPlaceholder) gradcamPlaceholder.style.display = 'block';
+            const openBtn = document.getElementById('openGradcamBtn');
+            if (openBtn) openBtn.style.display = 'none';
+            let gradcamMsg = document.getElementById('gradcamMsg');
+            if (!gradcamMsg) {
+              gradcamMsg = document.createElement('div');
+              gradcamMsg.id = 'gradcamMsg';
+              gradcamMsg.style.color = 'red';
+              gradcamMsg.style.marginTop = '10px';
+              interpretationImage.parentNode.appendChild(gradcamMsg);
+            }
+            gradcamMsg.textContent = 'No GradCAM available for this prediction.';
+            gradcamMsg.style.display = 'block';
+          }
+
+          // --- Render prediction results in the correct DOM elements (RIGHT COLUMN) ---
+          const prediction = data.prediction || [];
+          console.log('[UI] Filling classificationList with:', prediction);
+
+          // Update the <ul> in the right column
+          const classificationList = document.getElementById('classificationList');
+          if (classificationList) {
+            classificationList.innerHTML = '';
+            if (Array.isArray(prediction) && prediction.length > 0) {
+              prediction.forEach(item => {
+                let className = item.class_name || (Array.isArray(item) ? item[0] : '');
+                let probability = item.probability || (Array.isArray(item) ? item[1] : 0);
+                const li = document.createElement('li');
+                li.style.fontSize = '20px';
+                li.style.marginBottom = '12px';
+                li.style.color = '#222';
+                li.innerHTML = `<strong>${className}</strong>: ${(probability * 100).toFixed(1)}%`;
+                classificationList.appendChild(li);
+              });
+            } else {
+              const li = document.createElement('li');
+              li.textContent = 'No classifications available.';
+              classificationList.appendChild(li);
+            }
+          } else {
+            console.warn('[UI] classificationList element not found!');
+          }
+
+          // - Top 5 predictions -
+          const top5Container = document.getElementById('top5Predictions');
+          if (top5Container && Array.isArray(data.top5)) {
+            const positiveSet = new Set((data.prediction || []).map(item => item.class_name));
+            top5Container.innerHTML = `<h3>Top 5 Predictions</h3><ol style="padding:0;list-style-position:inside;max-width:500px;margin:0 auto;text-align:left;">
+            </ol>`;
+            const ol = top5Container.querySelector('ol');
+            data.top5.forEach(item => {
+              let className = item.class_name || (Array.isArray(item) ? item[0] : '');
+              let probability = item.probability || (Array.isArray(item) ? item[1] : 0);
+              let isPositive = positiveSet.has(className);
+              const li = document.createElement('li');
+              li.style.display = 'flex';
+              li.style.alignItems = 'center';
+              li.style.gap = '16px';
+              li.style.marginBottom = '8px';
+              li.innerHTML = `
+                <span style="display:inline-block;min-width:140px;font-weight:bold;">${className}</span>
+                <span style="display:inline-block;min-width:70px;">${(probability * 100).toFixed(2)}%</span>
+                <span style="display:inline-block;padding:2px 10px;border-radius:12px;font-size:13px;font-weight:bold;color:#fff;background:${isPositive ? '#28a745' : '#dc3545'};">
+                  ${isPositive ? 'Positive' : 'Negative'}
+                </span>
+              `;
+              ol.appendChild(li);
+            });
+          }
+          // -End top 5 predictions section-
+        })
+        .catch(error => {
+          console.error('[UI] Error during classification:', error);
+          alert('An error occurred while classifying the image: ' + error);
+          loadingScreen.style.display = 'none';
+          document.querySelector('.upload-container').style.display = 'block';
+        });
+    });
+
+    const backButton = document.getElementById('backButton');
+    backButton.addEventListener('click', () => {
+      document.getElementById('resultScreen').style.display = 'none';
+      document.querySelector('.upload-container').style.display = 'block';
+    });
+
+    const continueButton = document.getElementById('continueButton');
+    continueButton.addEventListener('click', () => {
+      window.location.href = '/radiologist-classifier';
+    });
+
+    // Dark mode logic
+    function setDarkMode(enabled) {
+        if (enabled) {
+            document.body.classList.add('darkmode');
+            document.getElementById('mainContent').classList.add('darkmode');
+            document.getElementById('sidebar').classList.add('darkmode');
+            // Set all sidebar links to darkmode
+            document.querySelectorAll('.sidebar .menu ul li a').forEach(a => a.classList.add('darkmode'));
+        } else {
+            document.body.classList.remove('darkmode');
+            document.getElementById('mainContent').classList.remove('darkmode');
+            document.getElementById('sidebar').classList.remove('darkmode');
+            document.querySelectorAll('.sidebar .menu ul li a').forEach(a => a.classList.remove('darkmode'));
+        }
+    }
+    // Load dark mode preference
+    const darkModePref = localStorage.getItem('darkmode') === 'true';
+    setDarkMode(darkModePref);
+    // Listen for dark mode changes from other tabs/pages
+    window.addEventListener('storage', function(e) {
+        if (e.key === 'darkmode') setDarkMode(e.newValue === 'true');
+    });
+
+  </script>
+</body>
+</html>

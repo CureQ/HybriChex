@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Radiologist Classifier</title>
+    <!-- Include the Rethink Sans font -->
+    <link href="https://fonts.googleapis.com/css2?family=Rethink+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/59ff2ab718.js" crossorigin="anonymous"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Rethink Sans', Arial, sans-serif;
+            background-color: #f5f7fa;
+            color: #222;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: #ffffff;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .sidebar .menu {
+            padding: 20px;
+        }
+
+        .sidebar .menu h2 {
+            font-size: 18px;
+            color: #007bff;
+            margin-bottom: 20px;
+        }
+
+        .sidebar .menu ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar .menu ul li {
+            margin-bottom: 15px;
+        }
+
+        .sidebar .menu ul li a {
+            text-decoration: none;
+            color: #333;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            transition: color 0.3s;
+        }
+
+        .sidebar .menu ul li a:hover {
+            color: #007bff;
+        }
+
+        .sidebar .menu ul li a.active {
+            color: #007bff;
+            font-weight: bold;
+        }
+
+        .sidebar .logout {
+            padding: 20px;
+            text-align: center;
+        }
+
+        .sidebar .logout a {
+            text-decoration: none;
+            color: #ff4d4d;
+            font-size: 16px;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #eef2f7;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .main-content img {
+            max-width: 500px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .main-content .message {
+            font-size: 18px;
+            color: #555;
+            text-align: center;
+        }
+
+        .classification-group {
+            margin-bottom: 20px;
+        }
+
+        .classification-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            background-color: #fff;
+            color: #333;
+            transition: background 0.3s, color 0.3s;
+            font-size: 18px;
+        }
+
+        /* Dark mode styles */
+        body.darkmode, .main-content.darkmode {
+            background-color: #181a1b !important;
+            color: #f5f7fa !important;
+        }
+
+        .sidebar.darkmode {
+            background-color: #23272b !important;
+        }
+
+        .sidebar .menu ul li a.darkmode {
+            color: #f5f7fa !important;
+        }
+
+        .main-content.darkmode {
+            background-color: #181a1b !important;
+            color: #f5f7fa !important;
+        }
+
+        .main-content .message {
+            color: #e0e0e0;
+        }
+
+        body.darkmode .classification-group select {
+            background-color: #2c2c2c;
+            color: #e0e0e0;
+            border: 1px solid #444;
+        }
+
+        body.darkmode button, .main-content.darkmode button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+        }
+
+        body.darkmode button:hover, .main-content.darkmode button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Modal styles for fullscreen image */
+        .modal-img-viewer {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 0; top: 0; width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.85);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-img-viewer.active {
+            display: flex;
+        }
+        .modal-img-viewer img {
+            max-width: 90vw;
+            max-height: 90vh;
+            border-radius: 8px;
+            box-shadow: 0 0 20px #000;
+            background: #fff;
+        }
+        .modal-img-viewer .close-modal {
+            position: absolute;
+            top: 30px;
+            right: 40px;
+            color: #fff;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 10000;
+            text-shadow: 0 2px 8px #000;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar" id="sidebar">
+            <div class="menu">
+                <h2>HybridCheX.</h2>
+                <ul>
+          <li><a href="/dashboard"> <i class="fa-solid fa-table-columns" style="margin-right: 8px;"></i> Dashboard</a></li>
+          <li><a href="/model-classifier"> <i class="fa-solid fa-robot" style="margin-right: 8px;"></i> Model Classifier </a>  </li> 
+          <li><a href="/radiologist-classifier" class="active"> <i class="fa-solid fa-user-doctor" style="margin-right: 8px;"></i> Radiologist Classifier</a></li>
+          <li><a href="/report"> <i class="fa-solid fa-file-lines" style="margin-right: 8px;"></i> Report</a></li>
+          <li><a href="/settings"><i class="fa-solid fa-gear" style="margin-right: 8px;"></i>Settings</a></li>
+          <li><a href="/documentation"> <i class="fa-solid fa-circle-info" style=" margin-right: 8px;"></i>Documentation</a></li>
+        </ul>
+      </div>
+      <div class="logout">
+        <a href="#"> <i class="fa-solid fa-right-from-bracket" style=" margin-right: 8px;"></i>Log out</a>
+            </div>
+        </div>
+        <div class="main-content" id="mainContent">
+            <div id="content">
+                {% if uploaded_image %}
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <!-- Left Section: Image and Classification -->
+                    <div style="flex: 1; text-align: center; margin-right: 20px;">
+                        <!-- <button style="background-color: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 5px; margin-bottom: 20px;">X-Ray Image</button> -->
+                        <h3 style="margin-top: 20px;">Processed Image</h3>
+                        <img id="cxrImage" src="{{ uploaded_image }}" alt="Uploaded CXR" style="max-width: 100%; border: 1px solid #ccc; border-radius: 5px; margin-bottom: 20px; cursor: pointer;">
+                        <h3 style="margin-top: 20px;">HybridCheX Classification</h3>
+                        <p style="font-size: 24px; font-weight: bold;">
+                            {% if model_classifications and model_classifications|length > 0 %}
+                                {{ model_classifications | join(', ') }}
+                            {% else %}
+                                No classification available
+                            {% endif %}
+                        </p>
+                    </div>
+
+                    <!-- Right Section: Dropdown and +/- Buttons and Confirm Button -->
+                    <div style="flex: 1; text-align: center; display: flex; flex-direction: column; align-items: center;">
+                        <h3 style="margin-bottom: 20px;">Classification Options</h3>
+                        <div id="classificationContainer" style="width: 100%;">
+                            <div class="classification-group" style="margin-bottom: 20px;">
+                                <select style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; margin-bottom: 10px; font-size: 18px;">
+                                    <option value="" disabled selected>Enter classification</option>
+                                    <option value="Atelectasis">Atelectasis</option>
+                                    <option value="Cardiomegaly">Cardiomegaly</option>
+                                    <option value="Effusion">Effusion</option>
+                                    <option value="Infiltration">Infiltration</option>
+                                    <option value="Mass">Mass</option>
+                                    <option value="Nodule">Nodule</option>
+                                    <option value="Pneumonia">Pneumonia</option>
+                                    <option value="Pneumothorax">Pneumothorax</option>
+                                    <option value="Consolidation">Consolidation</option>
+                                    <option value="Edema">Edema</option>
+                                    <option value="Emphysema">Emphysema</option>
+                                    <option value="Fibrosis">Fibrosis</option>
+                                    <option value="Pleural Thickening">Pleural Thickening</option>
+                                    <option value="Hernia">Hernia</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div style="width: 100%; display: flex; justify-content: center;">
+                            <button id="addClassification" style="background-color: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 5px;">+</button>
+                            <button id="removeClassification" style="background-color: #ff4d4d; color: white; border: none; padding: 10px 20px; border-radius: 5px; margin-left: 10px;">-</button>
+                        </div>
+                        <button id="confirmClassification"
+                            style="background-color: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 5px; margin-top: 70px; align-self: center;">
+                            Confirm Classification
+                        </button>
+                    </div>
+                </div>
+                <!-- Modal for fullscreen image -->
+                <div id="modalImgViewer" class="modal-img-viewer">
+                    <span class="close-modal" id="closeModalBtn">&times;</span>
+                    <img id="modalImg" src="" alt="Full Screen X-Ray">
+                </div>
+                {% else %}
+                <p class="message" style = "color: black">First upload CXR in Model Classification</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+    <script>
+        document.getElementById("addClassification").addEventListener("click", function () {
+            // Maak een nieuwe <div> met een <select> erin
+            const newGroup = document.createElement("div");
+            newGroup.className = "classification-group";
+            newGroup.style.marginBottom = "20px";
+            newGroup.style.width = "100%";
+
+            const select = document.createElement("select");
+            select.style.width = "100%";
+            select.style.padding = "10px";
+            select.style.border = "1px solid #ccc";
+            select.style.borderRadius = "5px";
+            select.style.marginBottom = "10px";
+            select.style.fontSize = "18px";
+
+            const placeholderOption = document.createElement("option");
+            placeholderOption.value = "";
+            placeholderOption.text = "Enter classification";
+            placeholderOption.disabled = true;
+            placeholderOption.selected = true;
+            select.appendChild(placeholderOption);
+
+            const options = [
+                "Atelectasis", "Cardiomegaly", "Effusion", "Infiltration", "Mass",
+                "Nodule", "Pneumonia", "Pneumothorax", "Consolidation", "Edema",
+                "Emphysema", "Fibrosis", "Pleural Thickening", "Hernia"
+            ];
+
+            options.forEach(function (opt) {
+                const option = document.createElement("option");
+                option.value = opt;
+                option.text = opt;
+                select.appendChild(option);
+            });
+
+            newGroup.appendChild(select);
+
+            // Voeg de nieuwe groep toe aan het container element
+            document.getElementById("classificationContainer").appendChild(newGroup);
+        });
+
+        document.getElementById("removeClassification").addEventListener("click", function () {
+            const container = document.getElementById("classificationContainer");
+            const groups = container.getElementsByClassName("classification-group");
+            if (groups.length > 1) {
+                container.removeChild(groups[groups.length - 1]);
+            }
+        });
+
+        document.getElementById("confirmClassification").addEventListener("click", function () {
+            // Verzamel radioloog-classificaties uit alle dropdowns
+            const selects = document.querySelectorAll("#classificationContainer select");
+            const radiologistClassifications = [];
+            selects.forEach(sel => {
+                if (sel.value) radiologistClassifications.push(sel.value);
+            });
+
+            // Haal model classificaties uit de pagina
+            let modelClassifications = "";
+            const modelClassElem = document.querySelector('h3 + p');
+            if (modelClassElem) {
+                modelClassifications = modelClassElem.textContent.trim();
+            }
+
+            // Sla beide op in localStorage
+            localStorage.setItem('model_classification', modelClassifications);
+            localStorage.setItem('radiologist_classification', radiologistClassifications.join(', '));
+
+            // Navigeer naar rapportpagina
+            window.location.href = "/report";
+        });
+
+        // Dark mode logic
+        function setDarkMode(enabled) {
+            if (enabled) {
+                document.body.classList.add('darkmode');
+                document.getElementById('mainContent').classList.add('darkmode');
+                document.getElementById('sidebar').classList.add('darkmode');
+                document.querySelectorAll('.sidebar .menu ul li a').forEach(a => a.classList.add('darkmode'));
+            } else {
+                document.body.classList.remove('darkmode');
+                document.getElementById('mainContent').classList.remove('darkmode');
+                document.getElementById('sidebar').classList.remove('darkmode');
+                document.querySelectorAll('.sidebar .menu ul li a').forEach(a => a.classList.remove('darkmode'));
+            }
+        }
+        // Load dark mode preference
+        const darkModePref = localStorage.getItem('darkmode') === 'true';
+        setDarkMode(darkModePref);
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'darkmode') setDarkMode(e.newValue === 'true');
+        });
+
+        // Fullscreen image modal logic
+        document.addEventListener('DOMContentLoaded', function () {
+            var img = document.getElementById('cxrImage');
+            var modal = document.getElementById('modalImgViewer');
+            var modalImg = document.getElementById('modalImg');
+            var closeBtn = document.getElementById('closeModalBtn');
+            if (img && modal && modalImg && closeBtn) {
+                img.addEventListener('click', function () {
+                    modalImg.src = img.src;
+                    modal.classList.add('active');
+                });
+                closeBtn.addEventListener('click', function () {
+                    modal.classList.remove('active');
+                });
+                modal.addEventListener('click', function (e) {
+                    if (e.target === modal) modal.classList.remove('active');
+                });
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+Flask
+scikit-learn
+numpy
+pandas
+jinja2
+requests
+torchvision
+timm
+yacs
+grad-cam
+opencv-python

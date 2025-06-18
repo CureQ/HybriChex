@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Settings</title>
+    <link href="https://fonts.googleapis.com/css2?family=Rethink+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/59ff2ab718.js" crossorigin="anonymous"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Rethink Sans', Arial, sans-serif;
+            background-color: #f5f7fa;
+            color: #222;
+            transition: background 0.3s, color 0.3s;
+        }
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+        .sidebar {
+            width: 250px;
+            background-color: #ffffff;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .sidebar .menu {
+            padding: 20px;
+        }
+        .sidebar .menu h2 {
+            font-size: 18px;
+            color: #007bff;
+            margin-bottom: 20px;
+        }
+        .sidebar .menu ul {
+            list-style: none;
+            padding: 0;
+        }
+        .sidebar .menu ul li {
+            margin-bottom: 15px;
+        }
+        .sidebar .menu ul li a {
+            text-decoration: none;
+            color: #333;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+        }
+        .sidebar .menu ul li a:hover {
+            color: #007bff;
+        }
+        .sidebar .menu ul li a.active {
+            color: #007bff;
+            font-weight: bold;
+        }
+        .sidebar .logout {
+            padding: 20px;
+            text-align: center;
+        }
+        .sidebar .logout a {
+            text-decoration: none;
+            color: #ff4d4d;
+            font-size: 16px;
+        }
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #eef2f7;
+            padding: 20px;
+            transition: background 0.3s, color 0.3s;
+        }
+        .settings-box {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            padding: 40px 30px;
+            min-width: 350px;
+            text-align: left;
+        }
+        .settings-box h2 {
+            margin-top: 0;
+            margin-bottom: 30px;
+            color: #007bff;
+        }
+        .setting-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .setting-label {
+            flex: 1;
+            font-size: 18px;
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 28px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 28px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #007bff;
+        }
+        input:checked + .slider:before {
+            transform: translateX(22px);
+        }
+        /* Dark mode styles */
+        body.darkmode, .main-content.darkmode {
+            background-color: #181a1b !important;
+            color: #f5f7fa !important;
+        }
+        .sidebar.darkmode {
+            background-color: #23272b !important;
+        }
+        .settings-box.darkmode {
+            background: #23272b !important;
+            color: #f5f7fa !important;
+        }
+        .sidebar .menu ul li a.darkmode {
+            color: #f5f7fa !important;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="sidebar" id="sidebar">
+        <div class="menu">
+            <h2>HybridCheX.</h2>
+            <ul>
+<li><a href="/dashboard"> <i class="fa-solid fa-table-columns" style="margin-right: 8px;"></i> Dashboard</a></li>
+          <li><a href="/model-classifier"> <i class="fa-solid fa-robot" style="margin-right: 8px;"></i> Model Classifier </a>  </li> 
+          <li><a href="/radiologist-classifier"> <i class="fa-solid fa-user-doctor" style="margin-right: 8px;"></i> Radiologist Classifier</a></li>
+          <li><a href="/report"> <i class="fa-solid fa-file-lines" style="margin-right: 8px;"></i> Report</a></li>
+          <li><a href="/settings" class="active"><i class="fa-solid fa-gear" style="margin-right: 8px;"></i>Settings</a></li>
+          <li><a href="/documentation"> <i class="fa-solid fa-circle-info" style=" margin-right: 8px;"></i>Documentation</a></li>
+        </ul>
+      </div>
+      <div class="logout">
+        <a href="#"> <i class="fa-solid fa-right-from-bracket" style=" margin-right: 8px;"></i>Log out</a>
+        </div>
+    </div>
+    <div class="main-content" id="mainContent">
+        <div class="settings-box" id="settingsBox">
+            <h2>Settings</h2>
+            <div class="setting-row">
+                <span class="setting-label">Dark Mode</span>
+                <label class="switch">
+                    <input type="checkbox" id="darkModeToggle">
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    // Dark mode logic
+    function setDarkMode(enabled) {
+        if (enabled) {
+            document.body.classList.add('darkmode');
+            document.getElementById('mainContent').classList.add('darkmode');
+            document.getElementById('sidebar').classList.add('darkmode');
+            document.getElementById('settingsBox').classList.add('darkmode');
+            // Set all sidebar links to darkmode
+            document.querySelectorAll('.sidebar .menu ul li a').forEach(a => a.classList.add('darkmode'));
+        } else {
+            document.body.classList.remove('darkmode');
+            document.getElementById('mainContent').classList.remove('darkmode');
+            document.getElementById('sidebar').classList.remove('darkmode');
+            document.getElementById('settingsBox').classList.remove('darkmode');
+            document.querySelectorAll('.sidebar .menu ul li a').forEach(a => a.classList.remove('darkmode'));
+        }
+    }
+    // Load dark mode preference
+    const darkModePref = localStorage.getItem('darkmode') === 'true';
+    document.getElementById('darkModeToggle').checked = darkModePref;
+    setDarkMode(darkModePref);
+    document.getElementById('darkModeToggle').addEventListener('change', function() {
+        setDarkMode(this.checked);
+        localStorage.setItem('darkmode', this.checked);
+    });
+</script>
+</body>
+</html>

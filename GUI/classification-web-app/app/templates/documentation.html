@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentation</title>
+    <link rel="stylesheet" href="/static/styles.css"> <!-- Link to shared CSS -->
+    <!-- Include the Rethink Sans font -->
+    <link href="https://fonts.googleapis.com/css2?family=Rethink+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/59ff2ab718.js" crossorigin="anonymous"></script>
+    <style>
+        body {
+            font-family: 'Rethink Sans', Arial, sans-serif;
+            margin: 0;
+            background-color: #f5f7fa;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: #ffffff;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .sidebar .menu {
+            padding: 20px;
+        }
+
+        .sidebar .menu h2 {
+            font-size: 18px;
+            color: #007bff;
+            margin-bottom: 20px;
+        }
+
+        .sidebar .menu ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar .menu ul li {
+            margin-bottom: 15px;
+        }
+
+        .sidebar .menu ul li a {
+            text-decoration: none;
+            color: #333;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+        }
+
+        .sidebar .menu ul li a:hover {
+            color: #007bff;
+        }
+
+        .sidebar .menu ul li a.active {
+            color: #007bff;
+            font-weight: bold;
+        }
+
+        .sidebar .logout {
+            padding: 20px;
+            text-align: center;
+        }
+
+        .sidebar .logout a {
+            text-decoration: none;
+            color: #ff4d4d;
+            font-size: 16px;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .main-content h1 {
+            font-size: 32px; /* Increased font size */
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .main-content p {
+            font-size: 16px;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .main-content .steps {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .main-content .step {
+            background-color: #ffffff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            border-radius: 5px;
+            flex: 1;
+        }
+
+        .main-content .step h2 {
+            font-size: 18px;
+            color: #007bff;
+            margin-bottom: 10px;
+        }
+
+        .main-content .step ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .main-content .step ul li {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 10px;
+        }
+
+        .main-content .disclaimer,
+        .main-content .support {
+            margin-top: 20px;
+            background-color: #ffffff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            border-radius: 5px;
+        }
+
+        .main-content .disclaimer h2,
+        .main-content .support h2 {
+            font-size: 18px;
+            color: #007bff;
+            margin-bottom: 10px;
+        }
+
+        /* Dark mode styles */
+        body.darkmode {
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+
+        .sidebar.darkmode {
+            background-color: #1e1e1e;
+            color: #e0e0e0;
+        }
+
+        .sidebar.darkmode .menu h2 {
+            color: #007bff;
+        }
+
+        .sidebar.darkmode .menu ul li a {
+            color: #e0e0e0;
+        }
+
+        .sidebar.darkmode .menu ul li a:hover {
+            color: #007bff;
+        }
+
+        .main-content.darkmode {
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+
+        .main-content.darkmode .step {
+            background-color: #1e1e1e;
+        }
+
+        .main-content.darkmode .disclaimer,
+        .main-content.darkmode .support {
+            background-color: #1e1e1e;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar" id="sidebar">
+            <div class="menu">
+                <h2>HybridCheX.</h2>
+                <ul>
+                 <li><a href="/dashboard"> <i class="fa-solid fa-table-columns" style="margin-right: 8px;"></i> Dashboard</a></li>
+          <li><a href="/model-classifier"> <i class="fa-solid fa-robot" style="margin-right: 8px;"></i> Model Classifier </a>  </li> 
+          <li><a href="/radiologist-classifier"> <i class="fa-solid fa-user-doctor" style="margin-right: 8px;"></i> Radiologist Classifier</a></li>
+          <li><a href="/report"> <i class="fa-solid fa-file-lines" style="margin-right: 8px;"></i> Report</a></li>
+          <li><a href="/settings"><i class="fa-solid fa-gear" style="margin-right: 8px;"></i>Settings</a></li>
+          <li><a href="/documentation" class="active"> <i class="fa-solid fa-circle-info" style=" margin-right: 8px;"></i>Documentation</a></li>
+        </ul>
+      </div>
+      <div class="logout">
+        <a href="#"> <i class="fa-solid fa-right-from-bracket" style=" margin-right: 8px;"></i>Log out</a>
+            </div>
+        </div>
+        <div class="main-content" id="mainContent">
+            
+            <h1>Overview</h1>
+This application is designed to assist in the classification of chest X-ray images using the HybriCheX AI model. It helps quickly identify potential findings on chest X-rays, saving time and supporting more informed decisions. The workflow involves three key steps:
+AI classification, Radiologist verification, Report generation. The app is based on three components: 
+                    <ul>
+                        <li><strong>To Do:</strong> A new inquiry is created, and the X-ray image needs to go through the HybriCheX model.</li>
+                        <li><strong>To Review:</strong> An inquiry is classified by the HybriCheX model. A radiologist needs to review the classification and/or write the radiologist report.</li>
+                        <li><strong>Done:</strong> An inquiry has gone through the HybriCheX model. The image and classification are reviewed and confirmed by a radiologist, and a radiologist report is written.</li>
+                    </ul> 
+                </li>
+            <div class="steps">
+                <div class="step">
+                    <h2>Step 1: HybriCheX Model Classification</h2>
+                    <ol>
+                        <li>Open the application and navigate to Model Classifier in the sidebar.</li>
+                        <li>Upload the chest X-ray image.</li>
+                        <li>The uploaded image is analyzed by the Model Classifier; this process takes a moment.</li>
+                        <li>The model classifies the image. The output, along with the original image and interpretation, is displayed on the screen.</li>
+                    </ol>
+                </div>
+                <div class="step">
+                    <h2>Step 2: Radiologist Verification</h2>
+                    <ol>
+                        <li>Open the application and navigate to Radiologist Classification in the sidebar.</li>
+                        <li>The screen displays the classified image with the predicted label.</li>
+                        <li>The radiologist must enter a label that best fits the image based on personal assessment.</li>
+                        <li>Confirm the label by clicking the Confirm Classification button.</li>
+                        <li>If the radiologist enters a label different from the HybriCheX classification, the radiologist's label will overwrite the HybriCheX-generated label.</li>
+                    </ol>
+                </div>
+                <div class="step">
+                    <h2>Step 3: Report Generation</h2>
+                    <ol>
+                        <li>After verification, the radiologist must generate a report...</li>
+                        <li>Navigate to the Report Generation tab...</li>
+                    </ol>
+                </div>
+            </div>
+            <div class="disclaimer">
+                <h2>Disclaimer</h2>
+                This system uses AI to classify chest X-ray (CXR) images. While it can support clinical decision-making, the output may not always be accurate. Users are strongly advised to verify and cross-reference the model’s predictions with their own clinical judgment and other diagnostic information.
+            </div>
+            <div class="support">
+                <h2>Support</h2>
+                For technical issues or further assistance, contact the support team at support@fakeemail.com.
+            </div>
+        </div>
+    </div>
+    <script>
+        // Dark mode logic
+    function setDarkMode(enabled) {
+        if (enabled) {
+            document.body.classList.add('darkmode');
+            document.getElementById('mainContent').classList.add('darkmode');
+            document.getElementById('sidebar').classList.add('darkmode');
+            document.querySelectorAll('.sidebar .menu ul li a').forEach(a => a.classList.add('darkmode'));
+        } else {
+            document.body.classList.remove('darkmode');
+            document.getElementById('mainContent').classList.remove('darkmode');
+            document.getElementById('sidebar').classList.remove('darkmode');
+            document.querySelectorAll('.sidebar .menu ul li a').forEach(a => a.classList.remove('darkmode'));
+        }
+    }
+    // Load dark mode preference
+    const darkModePref = localStorage.getItem('darkmode') === 'true';
+    setDarkMode(darkModePref);
+    window.addEventListener('storage', function(e) {
+        if (e.key === 'darkmode') setDarkMode(e.newValue === 'true');
+    });
+    </script>
+</body>
+</html>

@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report</title>
+    <link href="https://fonts.googleapis.com/css2?family=Rethink+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/59ff2ab718.js" crossorigin="anonymous"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Rethink Sans', Arial, sans-serif;
+            background-color: #f5f7fa;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: #ffffff;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100vh;
+            position: fixed;
+        }
+
+        .sidebar .menu {
+            padding: 20px;
+        }
+
+        .sidebar .menu h2 {
+            font-size: 18px;
+            color: #007bff;
+            margin-bottom: 20px;
+        }
+
+        .sidebar .menu ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar .menu ul li {
+            margin-bottom: 15px;
+        }
+
+        .sidebar .menu ul li a {
+            text-decoration: none;
+            color: #333;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+        }
+
+        .sidebar .menu ul li a:hover {
+            color: #007bff;
+        }
+
+        .sidebar .menu ul li a.active {
+            color: #007bff;
+            font-weight: bold;
+        }
+
+        .sidebar .logout {
+            padding: 20px;
+            text-align: center;
+        }
+
+        .sidebar .logout a {
+            text-decoration: none;
+            color: #ff4d4d;
+            font-size: 16px;
+        }
+
+        .main-content {
+            margin-left: 250px;
+            padding: 40px;
+        }
+
+        .report {
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .report h1 {
+            color: #007bff;
+            margin-bottom: 20px;
+        }
+
+        .report p {
+            font-size: 16px;
+            color: #555;
+            margin-bottom: 10px;
+        }
+
+        .report .findings {
+            margin-top: 20px;
+        }
+
+        .report .findings ul {
+            list-style: disc;
+            padding-left: 20px;
+        }
+
+        .report .findings ul li {
+            margin-bottom: 10px;
+        }
+
+        .generate-report {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .generate-report button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .generate-report button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Dark mode styles */
+        body.darkmode {
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+
+        .sidebar.darkmode {
+            background-color: #1e1e1e;
+            color: #e0e0e0;
+        }
+
+        .sidebar.darkmode .menu ul li a {
+            color: #e0e0e0;
+        }
+
+        .sidebar.darkmode .menu ul li a:hover {
+            color: #007bff;
+        }
+
+        .report.darkmode {
+            background-color: #1e1e1e;
+            color: #e0e0e0;
+        }
+
+        .report.darkmode h1 {
+            color: #007bff;
+        }
+
+        .generate-report button.darkmode {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .generate-report button.darkmode:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar" id="sidebar">
+            <div class="menu">
+                <h2>HybridCheX.</h2>
+                <ul>
+<li><a href="/dashboard"> <i class="fa-solid fa-table-columns" style="margin-right: 8px;"></i> Dashboard</a></li>
+          <li><a href="/model-classifier"> <i class="fa-solid fa-robot" style="margin-right: 8px;"></i> Model Classifier </a>  </li> 
+          <li><a href="/radiologist-classifier"> <i class="fa-solid fa-user-doctor" style="margin-right: 8px;"></i> Radiologist Classifier</a></li>
+          <li><a href="/report" class="active"> <i class="fa-solid fa-file-lines" style="margin-right: 8px;"></i> Report</a></li>
+          <li><a href="/settings"><i class="fa-solid fa-gear" style="margin-right: 8px;"></i>Settings</a></li>
+          <li><a href="/documentation"> <i class="fa-solid fa-circle-info" style=" margin-right: 8px;"></i>Documentation</a></li>
+        </ul>
+      </div>
+      <div class="logout">
+        <a href="#"> <i class="fa-solid fa-right-from-bracket" style=" margin-right: 8px;"></i>Log out</a>
+            </div>
+        </div>
+        <div class="main-content" id="mainContent">
+            <div class="report">
+                <h1>Radiology Report</h1>
+                <form action="/submit-report" method="POST">
+                    <label for="patient_name"><strong>Patient Name:</strong></label>
+                    <input type="text" id="patient_name" name="patient_name" required style="width: 100%; margin-bottom: 10px; padding: 8px;">
+
+                    <label for="dob"><strong>Date of Birth:</strong></label>
+                    <input type="date" id="dob" name="dob" required style="width: 100%; margin-bottom: 10px; padding: 8px;">
+
+                    <label for="exam_type"><strong>Examination Type:</strong></label>
+                    <input type="text" id="exam_type" name="exam_type" required style="width: 100%; margin-bottom: 10px; padding: 8px;">
+
+                    <label for="exam_date"><strong>Date of Examination:</strong></label>
+                    <input type="date" id="exam_date" name="exam_date" required style="width: 100%; margin-bottom: 10px; padding: 8px;">
+
+                    <label for="clinical_info"><strong>Clinical Information:</strong></label>
+                    <textarea id="clinical_info" name="clinical_info" rows="4" required style="width: 100%; margin-bottom: 10px; padding: 8px;"></textarea>
+
+                    <label for="findings"><strong>Findings:</strong></label>
+                    <textarea id="findings" name="findings" rows="4" required style="width: 100%; margin-bottom: 10px; padding: 8px;"></textarea>
+
+                    <label for="model_classification"><strong>Model Classification:</strong></label>
+                    <textarea id="model_classification" name="model_classification" rows="2" required style="width: 100%; margin-bottom: 10px; padding: 8px;"></textarea>
+
+                    <label for="radiologist_conclusion"><strong>Radiologist's Conclusion:</strong></label>
+                    <textarea id="radiologist_conclusion" name="radiologist_conclusion" rows="4" required style="width: 100%; margin-bottom: 10px; padding: 8px;"></textarea>
+
+                </form>
+            </div>
+
+            <div class="generate-report">
+                <button>Generate Report</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Dark mode logic
+        function setDarkMode(enabled) {
+            if (enabled) {
+                document.body.classList.add('darkmode');
+                document.getElementById('mainContent').classList.add('darkmode');
+                document.getElementById('sidebar').classList.add('darkmode');
+                document.querySelectorAll('.sidebar .menu ul li a').forEach(a => a.classList.add('darkmode'));
+            } else {
+                document.body.classList.remove('darkmode');
+                document.getElementById('mainContent').classList.remove('darkmode');
+                document.getElementById('sidebar').classList.remove('darkmode');
+                document.querySelectorAll('.sidebar .menu ul li a').forEach(a => a.classList.remove('darkmode'));
+            }
+        }
+        // Load dark mode preference
+        const darkModePref = localStorage.getItem('darkmode') === 'true';
+        setDarkMode(darkModePref);
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'darkmode') setDarkMode(e.newValue === 'true');
+        });
+
+        // Vul automatisch de classificatievelden in vanuit localStorage
+        document.addEventListener('DOMContentLoaded', function () {
+            const modelClass = localStorage.getItem('model_classification');
+            const radiologistClass = localStorage.getItem('radiologist_classification');
+            if (modelClass) {
+                document.getElementById('model_classification').value = modelClass;
+            }
+            if (radiologistClass) {
+                document.getElementById('radiologist_conclusion').value = radiologistClass;
+            }
+        });
+    </script>
+</body>
+</html>
